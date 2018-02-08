@@ -10,4 +10,8 @@
   "sslCert": "./cert.pem",
   "multiuser": true,
   "corsProxy": "/proxy"
+
+  /* for mTLS functionality */
+  "ca": "./rootCA.pem"
+  "caDomain": ".webid.example.com"
 }
