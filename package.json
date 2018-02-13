@@ -33,6 +33,7 @@
   "homepage": "http://github.com/solid/node-solid-server",
   "bugs": "http://github.com/solid/node-solid-server/issues",
   "dependencies": {
+    "base32-crockford-browser": "^1.0.0",
     "body-parser": "^1.14.2",
     "busboy": "^0.2.12",
     "camelize": "^1.0.0",
@@ -47,6 +48,7 @@
     "from2": "^2.1.0",
     "fs-extra": "^2.1.0",
     "glob": "^7.1.1",
+    "global-tunnel-ng": "^2.1.0",
     "handlebars": "^4.0.6",
     "http-proxy-middleware": "^0.17.4",
     "inquirer": "^1.0.2",
@@ -76,8 +78,7 @@
     "uuid": "^3.0.0",
     "valid-url": "^1.0.9",
     "vhost": "^3.0.2",
-    "webid": "^0.3.7",
-    "global-tunnel-ng": "^2.1.0"
+    "webid": "^0.3.7"
   },
   "optionalDependencies": {
     "x509": "^0.3.2"
