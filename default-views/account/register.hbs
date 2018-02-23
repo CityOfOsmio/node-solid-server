@@ -14,7 +14,11 @@
   {{#if registerDisabled}}
     {{> account/register-disabled}}
   {{else}}
-    {{> account/register-form}}
+    {{#if isMtls}}
+      {{> account/register-mtls-form}}
+    {{else}}
+      {{> account/register-form}}
+    {{/if}}
   {{/if}}
 </div>
 </body>
