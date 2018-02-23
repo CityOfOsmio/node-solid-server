@@ -1,0 +1,57 @@
+<form method="post" action="/api/accounts/new">
+  <div class="form-group">
+    {{#if error}}
+      <div class="row">
+        <div class="col-md-12">
+          <p class="text-danger"><strong>{{error}}</strong></p>
+        </div>
+      </div>
+    {{/if}}
+    <div class="row">
+      <div class="col-md-6">
+        mTLS Registration
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <p><strong>Username: </strong>{{{username}}}</p>
+      </div>
+      <div class="col-md-6">&nbsp;</div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" name="name" id="name" />
+      </div>
+      <div class="col-md-6">&nbsp;</div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <label for="email">Email:</label>
+        <p>Your email will only used for account recovery</p>
+        <input type="email" class="form-control" name="email" id="email" />
+      </div>
+      <div class="col-md-6">&nbsp;</div>
+    </div>
+    <input type="hidden" name="returnToUrl" value="{{returnToUrl}}" />
+  </div>
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary" id="register">Register</button>
+
+        {{> auth/auth-hidden-fields}}
+      </div>
+
+      <div class="col-md-10">
+        <div>Already have an account?
+          <a class="btn btn-xs btn-default"
+             href="{{{loginUrl}}}">
+            Log In
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
