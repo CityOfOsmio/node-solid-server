@@ -9,29 +9,26 @@
     {{/if}}
     <div class="row">
       <div class="col-md-6">
-        mTLS Registration
+        <h4>You are registering a local account on {{servername}} via
+        mTLS authentication with the following Credential Certificate</h4>
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6">
-        <p><strong>Username: </strong>{{{username}}}</p>
+      <div class="col-md-9">
+      <ul>
+          <li>Issuer: {{cert.issuer}}</li>
+          <li>Validity: {{cert.valid_after}} - {{cert.valid_until}}</li>
+          <li>Subject: {{cert.subject}}</li>
+          <li>Serial Number (hex): {{cert.serialnumber}}</li>
+      </ul>
       </div>
-      <div class="col-md-6">&nbsp;</div>
+      <div class="col-md-3">&nbsp;</div>
     </div>
     <div class="row">
-      <div class="col-md-6">
-        <label for="name">Name:</label>
-        <input type="text" class="form-control" name="name" id="name" />
+      <div class="col-md-9">
+        <p><strong>Derived WebID: </strong>{{{username}}}</p>
       </div>
-      <div class="col-md-6">&nbsp;</div>
-    </div>
-    <div class="row">
-      <div class="col-md-6">
-        <label for="email">Email:</label>
-        <p>Your email will only used for account recovery</p>
-        <input type="email" class="form-control" name="email" id="email" />
-      </div>
-      <div class="col-md-6">&nbsp;</div>
+      <div class="col-md-3">&nbsp;</div>
     </div>
     <input type="hidden" name="returnToUrl" value="{{returnToUrl}}" />
   </div>
