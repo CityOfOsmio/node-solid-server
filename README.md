@@ -1,5 +1,32 @@
 # solid-server in Node
 
+# Experimental Authenticity Branch
+
+This branch is an experiment by [The Authenticity
+Institute](https://osmio.ch/about/authenticity) to expand the Solid Server
+implementation to authenticate owners of data stored in the POD against client
+certificates issued in an Authenticity framework. Primarily this means that
+client certificate must be signed by an official CA, rather than be
+self-signed. Currently, the City of Osmio Virtual Records Department CA is the
+root authority, but it could be any central CA that users collectively agreed
+on.
+
+At the moment, we have also "faked" the WebID implementation, because Osmio VRD
+certificates are not currently issued with a Subject Alternative Name
+corresponding to the "WebID" for the identity in question. We would like to
+have a more coherent compatibility with WebID-TLS authentication, but pending
+some internal discussions about how this should work in our context, we have
+implemented a mechanism within node-solid-server that "derives" a WebID based
+on the Serial Number of the client certificate provided, using the following
+algorithm (for the moment):
+
+- https:// + 
+- Serial Number is encoded using Crockford's Base32 +
+- .webid.zkgroup.org + 
+- /profile/card#me
+
+# Resources
+
 [![](https://img.shields.io/badge/project-Solid-7C4DFF.svg?style=flat-square)](https://github.com/solid/solid)
 [![Build Status](https://travis-ci.org/solid/node-solid-server.svg?branch=master&style=flat-square)](https://travis-ci.org/solid/node-solid-server)
 [![NPM Version](https://img.shields.io/npm/v/solid-server.svg?style=flat-square)](https://npm.im/solid-server)
