@@ -12,6 +12,6 @@
   "corsProxy": "/proxy"
 
   /* for mTLS functionality */
-  "ca": "./rootCA.pem"
+  "ca": [ "./rootCA.pem", "./rootCA2.pem" ],
   "caDomain": ".webid.example.com"
 }
