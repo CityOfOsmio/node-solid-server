@@ -16,6 +16,15 @@
     </div>
     <div class="row">
       <div class="col-md-6">
+        <label for="keytype">Key Type:</label>
+        <select class="form-control" name="keytype" id="keytype">
+          <option value="rsa">RSA</option>
+          <option value="ecc">ECC</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
         <label for="password">Password:</label>
         <input type="password" class="form-control" name="password" id="password" />
       </div>
@@ -45,6 +54,12 @@
       </div>
       <div class="col-md-6">&nbsp;</div>
     </div>
+    <div class="row">
+      <div class="col-md-6">
+          <label for="certificatePublic">Generated Certificate</label>
+          <textarea class="form-control" name="certificatePublic" id="certificatePublic"></textarea>
+      </div>
+    </div>
     <input type="hidden" name="returnToUrl" value="{{returnToUrl}}" />
   </div>
 
@@ -67,3 +82,116 @@
     </div>
   </div>
 </form>
+<!-- <script src="common/js/webid-certgen-0.0.1.min.js"></script> -->
+<script src="common/js/enrollment-2.0.4.min.js"></script>
+<script type="text/javascript">
+  const button = document.getElementById('register');
+  const keytype = document.getElementById('keytype');
+  const username_f = document.getElementById('username');
+  const email_f = document.getElementById('email');
+  const name_f = document.getElementById('name');
+  const externalWebId_f = document.getElementById('externalWebId');
+  const password = document.getElementById('password');
+  const certificate_f = document.getElementById('certificatePublic');
+
+  function formatPEM(pemString) {
+    /// <summary>Format string in order to have each line with length equal to 63</summary>
+    /// <param name="pemString" type="String">String to format</param>
+
+    const stringLength = pemString.length;
+    let resultString = "";
+
+    for(let i = 0, count = 0; i < stringLength; i++, count++) {
+      if(count > 63) {
+        resultString = `${resultString}\r\n`;
+        count = 0;
+      }
+      resultString = `${resultString}${pemString[i]}`;
+    }
+    return resultString;
+  }
+
+  button.addEventListener('click', function(event) {
+    // TODO: take this out so normal validation still happens
+    event.preventDefault();
+
+    // First check the account name, with an AJAX POST to webidfor API endpoint
+    let data = {
+      username: username_f.value,
+      email: email_f.value,
+      name: name_f.value,
+      externalWebId: externalWebId_f.value
+    };
+
+    let formdata = {
+      method: 'POST',
+      // TODO: add credentials: 'include' here, as per login/tls approach (not sure what this does exactly!)
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(data),
+    };
+    fetch('/api/accounts/webidfor', formdata).then(function (response) {
+      return response.text();
+    }).then(function (webid) {
+
+      // DEBUG
+      console.log("webid: "+webid);
+
+      // 2. generate a pair of keys for this webid
+      let options = { type: keytype.value.toUpperCase() };
+
+      enrollment.keygen.keygen(options).then(function (keypair) {
+      // DEBUG
+        console.log("keypair: "+keypair);
+      //let pubkey = keypair.publicKey;
+      //return crypto.subtle.exportKey("jwk", pubkey);
+
+        // 3. Create and self-sign this certificate with the keys
+        enrollment.cert.generateAndSign(keypair, webid).then((cert_data) => {
+          // DEBUG
+          console.log(cert_data);
+
+          // 4. Package it all up in a .p12 and send it back to the user for Download/Install
+
+          let certificateBuffer = cert_data.certificate.toSchema(true).toBER(false);
+          let certificateString = String.fromCharCode.apply(null, new Uint8Array(certificateBuffer));
+
+            let resultString = "-----BEGIN CERTIFICATE-----\r\n";
+            resultString = `${resultString}${formatPEM(window.btoa(certificateString))}`;
+            resultString = `${resultString}\r\n-----END CERTIFICATE-----\r\n`;
+
+            // fill this value in to a textarea for submitting with the form at the end..
+            certificate_f.innerHTML = resultString;
+
+            return enrollment.pkcs12.create({
+              password: password.value,
+              certificateChain: [resultString],
+              key: cert_data.keypair,
+          });
+        }).then((encodedP12) => {
+          // DEBUG
+          console.log(encodedP12);
+          // Now send the final .p12 file back to the user
+          var byteChars = atob(encodedP12);
+          var byteNums = new Array(byteChars.length);
+          for (var i=0 ; i < byteChars.length ; i++) {
+            byteNums[i] = byteChars.charCodeAt(i);
+          }
+          var byteArray = new Uint8Array(byteNums);
+          const pkcs12AsBlob = new Blob([byteArray], { type: "application/x-pkcs12" });
+
+          const downloadLink = document.createElement("a");
+          // TODO: give it a proper name
+          downloadLink.download = "pkijs_pkcs12.p12";
+          downloadLink.innerHTML = "Download P12";
+
+          downloadLink.href = window.URL.createObjectURL(pkcs12AsBlob);
+          downloadLink.onclick = function (event) { document.body.removeChild(event.target); }
+          downloadLink.style.display = "none";
+          document.body.appendChild(downloadLink);
+
+          downloadLink.click();
+        });
+      });
+    });
+  });
+</script>
